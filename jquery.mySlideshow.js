@@ -20,17 +20,23 @@
 			
 			var opt_silde_time = 700;
 			
-			var opt_auto_slide_interval = 0;
+			var opt_auto_slide_interval = 5000;
 			
 			var opt_slide_guide = true;
 			
+			
+			// TODO:
+			// デザインをオプションで指定
+			// デフォルトはシンプルなデザイン
+			// prev、nextの画像を指定できるように？
+			// 背景（ul部分とか）も指定できるように？
 			
 			// 初期化
 			var $slideshow  = $(this);
 			var disp_number = 0;
 			var image_cnt   = 0;
 			
-			// セレクタの要素内へスライドショーを描写する
+			// スライドショーHTMLを生成する
 			var html;
 			html  = '<div class="prev-button"></div>';
 			html += '<ul class="image-area">';
@@ -42,10 +48,13 @@
 			html += '<div class="next-button"></div>';
 			html += '<div class="clear"></div>';
 			
+			// TODO:
+			// スライドガイドを生成する
 			if(opt_slide_guide) {
 				
 			}
 			
+			// セレクタの要素内へHTMLを描写する
 			$slideshow.append(html);
 			
 			// positionのleft位置を設定する
@@ -68,7 +77,6 @@
 				left += opt_li_width + opt_li_x_margin - opt_r_l_disp;
 				
 			});
-			
 			
 			// 画面をロード後、画像をリサイズする
 			$(window).bind('load', function() {
@@ -93,6 +101,57 @@
 			
 			});
 			
+			//TODO:autoイベントをつくる
+			var id = false;
+			// 自動切り替えが有効であれば、実行する
+			if(opt_auto_slide_interval) {
+				
+				var i = 0;
+				
+				// 自動切り替えイベント実行
+				autoSlide();
+				// show → start でループ
+				function autoSlide() {
+					
+					
+					
+					id = setTimeout(function() {
+						/*
+						console.log('pass', i);
+						i++;
+						*/
+						
+						// 「ひとつ後の画像へ進むイベント」と全く同じ
+						if(disp_number < image_cnt-1) {
+							disp_number++;
+							
+							var movement = $slideshow.children('ul').children('li:eq('+disp_number+')').position().left - opt_li_x_margin;
+							
+							$slideshow.children('ul').children('li').stop().animate({
+								"left": '-=' + Math.abs(movement) + 'px'
+							}, opt_silde_time, function() {
+								
+							});
+						} else {
+							
+							disp_number = 0;
+					
+							var movement = $slideshow.children('ul').children('li:eq('+disp_number+')').position().left - opt_li_x_margin;
+							
+							$slideshow.children('ul').children('li').stop().animate({
+								"left": '+=' + Math.abs(movement) + 'px'
+							}, opt_silde_time, function() {
+								
+							});
+							
+						}
+						
+						autoSlide();
+					}, opt_auto_slide_interval);
+					
+					
+				}
+			}
 			
 			// ひとつ前の画像へ戻るイベントを監視
 			$slideshow.children('.prev-button').click(function() {
@@ -107,6 +166,10 @@
 					}, opt_silde_time, function() {
 						
 					});
+					
+					// autoをストップして再開する
+					clearTimeout(id);
+					autoSlide();
 				}
 			});
 			
@@ -123,11 +186,14 @@
 					}, opt_silde_time, function() {
 						
 					});
+					
+					// autoをストップして再開する
+					clearTimeout(id);
+					autoSlide();
 				}
 				
 			});
 			
-			//TODO:autoイベントをつくる
 			
 			
 /*
