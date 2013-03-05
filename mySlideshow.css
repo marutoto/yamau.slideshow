@@ -1,0 +1,55 @@
+
+.mySlideshow * {
+	padding: 0;
+	margin: 0;
+}
+
+.mySlideshow .prev-button {
+	background-color: red;
+	height: 100px;
+	width: 50px;
+	float: left;
+}
+
+.mySlideshow ul {
+	border: solid 2px;
+	/*height: 400px;*/
+	/*width: 350px;*/
+	float: left;
+	overflow: hidden;
+	position: relative;
+}
+
+.mySlideshow ul li {
+	display: table;
+
+	/*height: 300px;*/
+	width: auto;
+	height: auto;
+	position: absolute;
+	top: 50px;
+	
+	list-style-type: none;
+}
+
+
+.mySlideshow ul li p {
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.mySlideshow ul li p img{
+}
+
+.mySlideshow .next-button {
+	background-color: blue;
+	height: 100px;
+	width: 50px;
+	float: left;
+}
+
+.mySlideshow .clear {
+	clear: both;
+}
+

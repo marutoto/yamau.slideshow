@@ -3,11 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-31j">
 
-<style>
-h5 {
-margin: 10px 0 5px 0;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="mySlideshow.css" media="all">
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="jquery.mySlideshow.js"></script>
@@ -15,37 +11,23 @@ margin: 10px 0 5px 0;
 <script>
 $(function() {
 
-	// 表示領域に指定してある、srcが空のimgオブジェクトを取得
-	var $image = $('#slideshow');
-
 	// スライドショーに表示する画像パスを配列で指定
 	var images_url = [
-		'img/maru01.jpg',
-		'img/maru02.jpg',
-		'img/toto01.jpg',
-		'img/marutoto01.jpg',
-		'img/marutoto02.jpg'
+		'img/01.png',
+		'img/02.png',
+		'img/03.png',
+		'img/04.png',
+		'img/05.png',
+		'img/06.png'
 	];
 
 	// プラグインを呼び出し、オプションで画像パスを渡す
-	$image.mySlideshow({
+	$('.mySlideshow').mySlideshow({
 		images: images_url,
 		interval: 5000
 	});
 
-	$('#prev').click(function(event) {
-		event.preventDefault();
-		$image.trigger('prev_event');
-	});
-
-	$('#next').click(function(event) {
-		event.preventDefault();
-		$image.trigger('next_event');
-	});
-
-	$image.trigger('goto_event', 0);
-	$image.trigger('start_event');
-	                         // ↑初期表示画像の配列番号を引数で渡す
+	
 
 });
 </script>
@@ -56,13 +38,7 @@ $(function() {
 <h4>Slideshow Plugin</h4>
 
 <h5>○ jquery.mySlideshow.js : スライドショープラグイン</h5>
-<div id="mySlideshow">
-	<ul>
-		<li><a id="prev" href="#">戻る</a></li>
-		<li><img id="slideshow" /></li>
-		<li><a id="next" href="#">進む</a></li>
-	</ul>
-</div>
+<div class="mySlideshow"></div>
 
 <hr>
 <a href="..">戻る</a>
