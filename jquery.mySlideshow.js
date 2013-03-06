@@ -15,6 +15,7 @@
 			/******************************/
 			
 			// オプション
+			/*
 			var opt_li_width = 200;
 			var opt_li_x_margin = 30;
 			var opt_l_r_disp = 0;
@@ -24,18 +25,19 @@
 			
 			var opt_button_width = 50;
 			var opt_button_height = 100;
-			var opt_btn_img_l = 'im.ages/prev.png';
-			var opt_btn_img_r = 'im.ages/next.png';
+			var opt_btn_img_l = 'images/prev.png';
+			var opt_btn_img_r = 'images/next.png';
 			
 			var opt_silde_time = 500;
 			
 			var opt_auto_slide_interval = 3000;
 			
 			var opt_slide_guide = true;
+			*/
 			
 			// スライド動作時間 <= 自動スライドの間隔 の場合のみ、自動切換えは有効
 			// そうでない場合は自動スライドを無効にする
-			if(opt_silde_time > opt_auto_slide_interval) opt_auto_slide_interval = false;
+			if(opts.silde_time > opts.auto_slide_interval) opts.auto_slide_interval = false;
 			
 			
 			/***** TODO: *****/
@@ -57,14 +59,14 @@
 			
 			// スライドショーHTMLを生成する
 			var html;
-			html  = '<div class="prev-area"><div><img class="prev-button" src="'+opt_btn_img_l+'"></div></div>';
+			html  = '<div class="prev-area"><div><img class="prev-button" src="'+opts.btn_img_l+'"></div></div>';
 			html += '<ul class="image-area">';
 			for(var i in opts.images) {
 				html += '<li><p><img src="'+opts.images[i]+'"></p></li>';
 				image_cnt++;
 			}
 			html += '</ul>';
-			html += '<div class="next-area"><div><img class="next-button" src="'+opt_btn_img_r+'"></div></div>';
+			html += '<div class="next-area"><div><img class="next-button" src="'+opts.btn_img_r+'"></div></div>';
 			html += '<div class="clear"></div>';
 			
 			
@@ -72,7 +74,7 @@
 			
 			/***** TODO: *****/
 			// スライドガイドを生成する
-			if(opt_slide_guide) {
+			if(opts.slide_guide) {
 				
 			}
 			
@@ -83,23 +85,23 @@
 			$slideshow.append(html);
 			
 			// スライドショー画像のleft位置を設定する
-			var ul_width = opt_li_width + opt_li_x_margin * 2;
+			var ul_width = opts.li_width + opts.li_x_margin * 2;
 			
 			$slideshow.children('ul').css('width', ul_width+'px');
-			$slideshow.children('ul').children('li').css('width', opt_li_width+'px');
+			$slideshow.children('ul').children('li').css('width', opts.li_width+'px');
 			
-			var ul_height = opt_li_height + opt_li_y_margin * 2;
+			var ul_height = opts.li_height + opts.li_y_margin * 2;
 			
 			$slideshow.children('ul').css('height', ul_height+'px');
-			$slideshow.children('ul').children('li').css('height', opt_li_height+'px');
-			$slideshow.children('ul').children('li').css('top', opt_li_y_margin+'px');
+			$slideshow.children('ul').children('li').css('height', opts.li_height+'px');
+			$slideshow.children('ul').children('li').css('top', opts.li_y_margin+'px');
 			
-			var li_left = opt_li_x_margin;
+			var li_left = opts.li_x_margin;
 			
 			$slideshow.children('ul').children('li').each(function() {
 				
 				$(this).css('left', li_left+'px');
-				li_left += opt_li_width + opt_li_x_margin - opt_l_r_disp;
+				li_left += opts.li_width + opts.li_x_margin - opts.li_l_r_disp;
 				
 			});
 			
@@ -110,12 +112,12 @@
 			$slideshow.children('.next-area').css('height', ul_height+'px');
 			$slideshow.children('.next-area').children('div').css('height', ul_height+'px');
 			
-			var slideshow_width = ul_width + opt_button_width * 2;
+			var slideshow_width = ul_width + opts.button_width * 2;
 			$slideshow.css('width', slideshow_width+'px');
 			//$slideshow.css('background-color', '#000000');
 			
 			// 自動スライドが有効であれば、実行する（autoSlide()の初回起動）
-			if(opt_auto_slide_interval) {
+			if(opts.auto_slide_interval) {
 				autoSlide();
 			}
 			
@@ -127,7 +129,7 @@
 			// 画像をスライドさせる関数
 			function slideImage(disp_number) {
 				
-				var movement = $slideshow.children('ul').children('li:eq('+disp_number+')').position().left - opt_li_x_margin;
+				var movement = $slideshow.children('ul').children('li:eq('+disp_number+')').position().left - opts.li_x_margin;
 					
 				var plus_or_minus;
 				if(movement >= 0) plus_or_minus = '-';
@@ -135,7 +137,7 @@
 				
 				$slideshow.children('ul').children('li').stop().animate({
 					"left": plus_or_minus + '=' + Math.abs(movement) + 'px'
-				}, opt_silde_time);
+				}, opts.silde_time);
 				
 			}
 			
@@ -154,7 +156,7 @@
 					
 					autoSlide();
 					
-				}, opt_auto_slide_interval);
+				}, opts.auto_slide_interval);
 				
 			}
 			
@@ -214,12 +216,12 @@
 			$(window).bind('load', function() {
 			
 				// ボタン画像のリサイズ
-				resizeImage($slideshow.children('.prev-area').children('div').children('.prev-button'), opt_button_width, opt_button_height);
-				resizeImage($slideshow.children('.next-area').children('div').children('.next-button'), opt_button_width, opt_button_height);
+				resizeImage($slideshow.children('.prev-area').children('div').children('.prev-button'), opts.button_width, opts.button_height);
+				resizeImage($slideshow.children('.next-area').children('div').children('.next-button'), opts.button_width, opts.button_height);
 				
 				// スライド画像のリサイズ
 				$slideshow.children('ul').children('li').children('p').children('img').each(function() {
-					resizeImage($(this), opt_li_width, opt_li_height);
+					resizeImage($(this), opts.li_width, opts.li_height);
 				});
 			
 			});
@@ -230,7 +232,7 @@
 				if(disp_number > 0) {
 					disp_number--;
 					slideImage(disp_number);
-					if(opt_auto_slide_interval) resetInterval();
+					if(opts.auto_slide_interval) resetInterval();
 				}
 				
 			});
@@ -241,7 +243,7 @@
 				if(disp_number < image_cnt-1) {
 					disp_number++;
 					slideImage(disp_number);
-					if(opt_auto_slide_interval) resetInterval();
+					if(opts.auto_slide_interval) resetInterval();
 				}
 				
 			});
@@ -258,8 +260,8 @@
 			
 			}, function() {
 			
-				if($(this).attr('class') == 'prev-button') $(this).attr('src', opt_btn_img_l);
-				else                                       $(this).attr('src', opt_btn_img_r);
+				if($(this).attr('class') == 'prev-button') $(this).attr('src', opts.btn_img_l);
+				else                                       $(this).attr('src', opts.btn_img_r);
 			
 			});
 			
@@ -269,10 +271,22 @@
 
 	}
 
+	// デフォルトオプション
 	$.fn.mySlideshow.defaults = {
 		images: [],
-		interval: 2000
-
+		//images: ['no-image.png'],
+		li_width            : 200,
+		li_x_margin         : 30,
+		li_height           : 500,
+		li_y_margin         : 50,
+		li_l_r_disp         : 0,
+		button_width        : 50,
+		button_height       : 100,
+		btn_img_l           : 'images/prev.png',
+		btn_img_r           : 'images/next.png',
+		slide_time          : 500,
+		slide_guide         : false,
+		auto_slide_interval : 3000
 	}
 
 }) (jQuery);
