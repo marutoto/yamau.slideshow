@@ -22,11 +22,6 @@
 	vertical-align: middle;
 }
 
-.mySlideshow .prev-area div .prev-button {
-	/*background-color: red;*/
-	/*border: solid 1px;*/
-}
-
 .mySlideshow .next-area {
 	display: table;
 	float: left;
@@ -37,9 +32,8 @@
 	vertical-align: middle;
 }
 
-.mySlideshow .next-area div .next-button {
-	/*background-color: blue;*/
-	/*border: solid 1px;*/
+.mySlideshow div div img {
+	cursor: pointer;
 }
 
 
@@ -67,7 +61,13 @@
 
 
 /* フッター */
-.mySlideshow .clear {
+.mySlideshow .footer {
 	clear: both;
+	text-align: center;
+}
+
+.mySlideshow .footer img {
+	margin: 0 5px;
+	cursor: pointer;
 }
 

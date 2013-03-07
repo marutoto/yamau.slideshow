@@ -18,15 +18,17 @@ $(function() {
 		'img/03.png',
 		'img/04.png',
 		'img/05.png',
-		'img/06.png'
+		'img/06.png',
+		'img/07.png'
 	];
 
 	// プラグインを呼び出し、オプションで画像パスを渡す
 	$('.mySlideshow').mySlideshow({
 		images: images_url,
-		li_height: 450,
-		li_y_margin: 100
-		
+		li_height: 300,
+		li_y_margin: 30,
+		auto_slide_interval: 3500,
+		slide_guide: true,
 	});
 
 	

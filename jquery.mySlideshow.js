@@ -35,9 +35,6 @@
 			var opt_slide_guide = true;
 			*/
 			
-			// スライド動作時間 <= 自動スライドの間隔 の場合のみ、自動切換えは有効
-			// そうでない場合は自動スライドを無効にする
-			if(opts.silde_time > opts.auto_slide_interval) opts.auto_slide_interval = false;
 			
 			
 			/***** TODO: *****/
@@ -67,18 +64,22 @@
 			}
 			html += '</ul>';
 			html += '<div class="next-area"><div><img class="next-button" src="'+opts.btn_img_r+'"></div></div>';
-			html += '<div class="clear"></div>';
+			html += '<div class="footer">';
 			
-			
-			
-			
-			/***** TODO: *****/
 			// スライドガイドを生成する
 			if(opts.slide_guide) {
-				
+				for(var i in opts.images) {
+					if(i == 0) {
+						var filepath = splitFilename(opts.slide_guide_img);
+						filepath = filepath[0] + '-on.' + filepath[1];
+						html += '<img src="' + filepath + '">'
+					} else {
+						html += '<img src="' + opts.slide_guide_img + '">';
+					}
+				}
 			}
 			
-			
+			html += '</div>';
 			
 			
 			// セレクタの要素内へHTMLを描写する
@@ -112,14 +113,18 @@
 			$slideshow.children('.next-area').css('height', ul_height+'px');
 			$slideshow.children('.next-area').children('div').css('height', ul_height+'px');
 			
+			// スライドショー全体の幅を指定する
 			var slideshow_width = ul_width + opts.button_width * 2;
 			$slideshow.css('width', slideshow_width+'px');
 			//$slideshow.css('background-color', '#000000');
 			
+			
+			// スライド動作時間 <= 自動スライドの間隔 の場合のみ、自動スライドは有効
+			// そうでない場合は自動スライドを無効にする
+			if(opts.silde_time > opts.auto_slide_interval) opts.auto_slide_interval = false;
+			
 			// 自動スライドが有効であれば、実行する（autoSlide()の初回起動）
-			if(opts.auto_slide_interval) {
-				autoSlide();
-			}
+			if(opts.auto_slide_interval) autoSlide();
 			
 			
 			/****************/
@@ -146,13 +151,14 @@
 				
 				setTimeout_id = setTimeout(function() {
 					
-					if(disp_number < image_cnt-1) {
-						disp_number++;
-						slideImage(disp_number);
-					} else {
-						disp_number = 0;
-						slideImage(disp_number);
-					}
+					removeOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'), opts.slide_guide_img);
+					
+					if(disp_number < image_cnt-1) disp_number++;
+					else                          disp_number = 0;
+					
+					attachOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'));
+					
+					slideImage(disp_number);
 					
 					autoSlide();
 					
@@ -174,20 +180,28 @@
 				var img_w = $img_obj.width();
 				var img_h = $img_obj.height();
 				
-				// liの縦幅・横幅指定のうち、短いほうに合わせて画像をリサイズする
-				if(max_width >= max_height) {
-					if(max_height < img_h) {
-						$img_obj.height(max_height); // 縦幅指定が短いので、heightを基準に比率を保持してリサイズ
-					}
-				} else {
-					if(max_width < img_w) {
-						$img_obj.width(max_width);   // 横幅指定が短いので、widthを基準に比率を保持してリサイズ
-					}
+				// 横だけはみ出している場合
+				if(img_w > max_width && img_h <= max_height) {
+					$img_obj.width(max_width);
+					
+				// 縦だけはみ出している場合
+				} else if(img_w <= max_width && img_h > max_height) {
+					$img_obj.height(max_height);
+					
+				// どちらもはみ出している場合
+				} else if(img_w > max_width && img_h > max_height) {
+					
+					// 横差・縦差の大きい方に合わせてリサイズ
+					var x_diff = img_w - max_width;
+					var y_diff = img_h - max_height;
+					
+					if(x_diff > y_diff) $img_obj.width(max_width);
+					else                $img_obj.height(max_height);
+					
 				}
-				
 			}
 			
-			// 拡張子以前の文字列を取り出す関数
+			// 拡張子以前と以降に分割する関数
 			function splitFilename(filepath) {
 				
 				var arr_path = ['', ''];
@@ -207,6 +221,24 @@
 				
 			}
 			
+			// 画像ファイル名に「-on」をつける関数
+			function attachOn($img_obj) {
+				
+				var filepath = '';
+				filepath = splitFilename($img_obj.attr('src'));
+				filepath = filepath[0] + '-on.' + filepath[1];
+				
+				$img_obj.attr('src', filepath);
+				
+			}
+			
+			// 画像ファイル名から「-on」を取り除く関数（元画像pathに書き換える）
+			function removeOn($img_obj, origin_path) {
+				
+				$img_obj.attr('src', origin_path);
+				
+			}
+			
 			
 			/************************/
 			/* イベントを定義・監視 */
@@ -223,47 +255,77 @@
 				$slideshow.children('ul').children('li').children('p').children('img').each(function() {
 					resizeImage($(this), opts.li_width, opts.li_height);
 				});
+				
+				// スライドガイド画像のリサイズ
+				if(opts.slide_guide) {
+					var footer_width = $slideshow.children('.footer').width();
+					var guide_width  = $slideshow.children('.footer').children('img').width() + 10;
+					if(footer_width < (guide_width * image_cnt)) {
+						var adjust_width = footer_width / image_cnt - 10;
+						$slideshow.children('.footer').children('img').each(function() {
+							$(this).width(adjust_width);
+						});
+					}
+				}
 			
 			});
 			
 			// ひとつ前の画像へ戻るイベントを監視
 			$slideshow.children('.prev-area').children('div').children('.prev-button').click(function() {
 				
-				if(disp_number > 0) {
-					disp_number--;
-					slideImage(disp_number);
-					if(opts.auto_slide_interval) resetInterval();
-				}
+				removeOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'), opts.slide_guide_img);
+				
+				if(disp_number > 0) disp_number--;
+				else                disp_number = image_cnt-1;
+				
+				attachOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'));
+				slideImage(disp_number);
+				if(opts.auto_slide_interval) resetInterval();
 				
 			});
 			
 			// ひとつ後の画像へ進むイベントを監視
 			$slideshow.children('.next-area').children('div').children('.next-button').click(function() {
 				
-				if(disp_number < image_cnt-1) {
-					disp_number++;
-					slideImage(disp_number);
-					if(opts.auto_slide_interval) resetInterval();
-				}
+				removeOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'), opts.slide_guide_img);
+				
+				if(disp_number < image_cnt-1) disp_number++;
+				else                          disp_number = 0;
+				
+				attachOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'));
+				slideImage(disp_number);
+				if(opts.auto_slide_interval) resetInterval();
 				
 			});
 			
 			// マウスホバー時の画像切り替えイベントを監視
 			$slideshow.children('div').children('div').children('img').hover(function() {
-			
-				var filepath = '';
-				filepath = splitFilename($(this).attr('src'));
-				filepath = filepath[0] + '-on.' + filepath[1];
 				
-				$(this).attr('src', filepath);
+				attachOn($(this));
 				
 			
 			}, function() {
-			
-				if($(this).attr('class') == 'prev-button') $(this).attr('src', opts.btn_img_l);
-				else                                       $(this).attr('src', opts.btn_img_r);
-			
+				
+				if($(this).attr('class') == 'prev-button') removeOn($(this), opts.btn_img_l);
+				else                                       removeOn($(this), opts.btn_img_r);
+				
 			});
+			
+			// スライドガイドクリック時のイベントを監視
+			if(opts.slide_guide) {
+				$slideshow.children('.footer').children('img').click(function() {
+					
+					removeOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'), opts.slide_guide_img);
+					
+					disp_number = $slideshow.children('.footer').children('img').index(this);
+					
+					attachOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'));
+					
+					slideImage(disp_number);
+					if(opts.auto_slide_interval) resetInterval();
+					
+				});
+			}
 			
 		});
 
@@ -276,7 +338,7 @@
 		images: [],
 		//images: ['no-image.png'],
 		li_width            : 200,
-		li_x_margin         : 30,
+		li_x_margin         : 20,
 		li_height           : 500,
 		li_y_margin         : 50,
 		li_l_r_disp         : 0,
@@ -286,7 +348,8 @@
 		btn_img_r           : 'images/next.png',
 		slide_time          : 500,
 		slide_guide         : false,
-		auto_slide_interval : 3000
+		slide_guide_img     : 'images/guide.png',
+		auto_slide_interval : 0
 	}
 
 }) (jQuery);
