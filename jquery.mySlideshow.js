@@ -14,29 +14,6 @@
 			/* 初期化・オプションチェック */
 			/******************************/
 			
-			// オプション
-			/*
-			var opt_li_width = 200;
-			var opt_li_x_margin = 30;
-			var opt_l_r_disp = 0;
-			
-			var opt_li_height = 500;
-			var opt_li_y_margin = 50;
-			
-			var opt_button_width = 50;
-			var opt_button_height = 100;
-			var opt_btn_img_l = 'images/prev.png';
-			var opt_btn_img_r = 'images/next.png';
-			
-			var opt_silde_time = 500;
-			
-			var opt_auto_slide_interval = 3000;
-			
-			var opt_slide_guide = true;
-			*/
-			
-			
-			
 			/***** TODO: *****/
 			// デザインをオプションで指定
 			// デフォルトはシンプルなデザイン
@@ -49,6 +26,8 @@
 			var image_cnt   = 0;
 			var setTimeout_id = false;
 			
+			var before_x = 0;
+			var current_x = 0;
 			
 			/********************/
 			/* メインプログラム */
@@ -327,6 +306,82 @@
 				});
 			}
 			
+			// 【スマートフォン対応】画像のフリックイベントを監視
+			//$slideshow.children('ul').each(function() {
+				
+				//$slideshow.children('ul')[0].addEventListener('touchstart', slideImageHandler, false);
+				
+				//$slideshow.children('ul')[0].addEventListener('touchmove', slideImageHandler, false);
+				
+				//$slideshow.children('ul')[0].addEventListener('touchend', slideImageHandler, false);
+				
+			//});
+			
+			$slideshow.children('ul').bind('touchstart touchmove touchend', slideImageHandler);
+			
+			
+			function slideImageHandler(e) {
+				
+				var touch = e.originalEvent.touches[0];
+				var start_x = 0;
+				
+				if(e.type == 'touchstart') {
+					
+					// 自動スライドを止める
+					if(opts.auto_slide_interval) clearTimeout(setTimeout_id);
+					start_x  = touch.pageX;
+					before_x = touch.pageX;
+					
+					//$('#before').html(before_x);
+				}
+				
+				if(e.type == 'touchmove') {
+					
+					//$('#touchtest').html(touch.pageX);
+					var movement = 0;
+					current_x = touch.pageX;
+					movement = current_x - before_x;
+					
+					//$('#current').html(current_x);
+					//$('#diff').html(movement);
+					
+					
+					$slideshow.children('ul').children('li').css({
+						"left": '+=' + movement + 'px'
+					});
+					
+					
+					before_x = current_x;
+					
+					
+				}
+				
+				if(e.type == 'touchend') {
+					
+					//$('#touchtest').html('end');
+					
+					if(false) {
+						disp_number++;
+						
+					} else if(false) {
+						disp_number--;
+						
+					} else {
+						slideImage(disp_number);
+						
+					}
+					
+					// 自動スライドを再開する
+					if(opts.auto_slide_interval) autoSlide();
+					
+					//$('#before').html('');
+					//$('#current').html('');
+					//$('#diff').html('');
+					
+				}
+				
+			}
+			
 		});
 
 		return this;
@@ -335,8 +390,7 @@
 
 	// デフォルトオプション
 	$.fn.mySlideshow.defaults = {
-		images: [],
-		//images: ['no-image.png'],
+		images              : ['images/no-image.png'],
 		li_width            : 200,
 		li_x_margin         : 20,
 		li_height           : 500,
