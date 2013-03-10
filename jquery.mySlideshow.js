@@ -26,8 +26,12 @@
 			var image_cnt   = 0;
 			var setTimeout_id = false;
 			
-			var before_x = 0;
+			var start_x   = 0
+			var before_x  = 0;
 			var current_x = 0;
+			
+			var moveout_flg = false;
+			
 			
 			/********************/
 			/* メインプログラム */
@@ -306,77 +310,106 @@
 				});
 			}
 			
-			// 【スマートフォン対応】画像のフリックイベントを監視
-			//$slideshow.children('ul').each(function() {
-				
-				//$slideshow.children('ul')[0].addEventListener('touchstart', slideImageHandler, false);
-				
-				//$slideshow.children('ul')[0].addEventListener('touchmove', slideImageHandler, false);
-				
-				//$slideshow.children('ul')[0].addEventListener('touchend', slideImageHandler, false);
-				
-			//});
 			
+			// 【スマートフォン対応】画像のフリックイベントを監視
 			$slideshow.children('ul').bind('touchstart touchmove touchend', slideImageHandler);
 			
+			// TODO:セレクタを工夫する
+			$slideshow.children('.prev-area').bind('touchmove', stopSlideHandler);
+			$slideshow.children('.next-area').bind('touchmove', stopSlideHandler);
+			//$('*:not(.image-area,.image-area *)').bind('touchmove', stopSlideHandler);
+			//$slideshow.children().not('ul').bind('touchmove', stopSlideHandler);
 			
+			// 画像をスライドするハンドラ
 			function slideImageHandler(e) {
 				
 				var touch = e.originalEvent.touches[0];
-				var start_x = 0;
 				
 				if(e.type == 'touchstart') {
 					
+					moveout_flg = true;
+					
 					// 自動スライドを止める
 					if(opts.auto_slide_interval) clearTimeout(setTimeout_id);
-					start_x  = touch.pageX;
-					before_x = touch.pageX;
 					
-					//$('#before').html(before_x);
+					start_x   = touch.pageX;
+					before_x  = touch.pageX;
+					current_x = touch.pageX;
+
 				}
 				
 				if(e.type == 'touchmove') {
 					
-					//$('#touchtest').html(touch.pageX);
 					var movement = 0;
 					current_x = touch.pageX;
 					movement = current_x - before_x;
-					
-					//$('#current').html(current_x);
-					//$('#diff').html(movement);
-					
 					
 					$slideshow.children('ul').children('li').css({
 						"left": '+=' + movement + 'px'
 					});
 					
-					
 					before_x = current_x;
-					
 					
 				}
 				
 				if(e.type == 'touchend') {
 					
-					//$('#touchtest').html('end');
+					removeOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'), opts.slide_guide_img);
 					
-					if(false) {
-						disp_number++;
-						
-					} else if(false) {
-						disp_number--;
-						
-					} else {
-						slideImage(disp_number);
-						
-					}
+					console.log('endHandler');
+					checkMovement(start_x, current_x);
+					
+					slideImage(disp_number);
+					
+					attachOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'));
 					
 					// 自動スライドを再開する
 					if(opts.auto_slide_interval) autoSlide();
 					
-					//$('#before').html('');
-					//$('#current').html('');
-					//$('#diff').html('');
+				}
+				
+			}
+			
+			// スライドエリアから出たときにスライドを止めるハンドラ
+			function stopSlideHandler(e) {
+				
+				if(moveout_flg) {
+					
+					e.stopPropagation();
+					
+					removeOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'), opts.slide_guide_img);
+					
+					console.log('stopHandler');
+					checkMovement(start_x, current_x);
+					
+					slideImage(disp_number);
+					
+					attachOn($slideshow.children('.footer').children('img:eq(' + disp_number + ')'));
+					
+					if(opts.auto_slide_interval) autoSlide();
+					
+					moveout_flg = false;
+					
+				}
+				
+			}
+			
+			// スライド方向、量によりdisp_numを加算・減算する
+			function checkMovement(start, current) {
+				
+				var movement = current - start;
+				
+				console.log(movement);
+				
+				if(movement > 50) {
+					
+					if(disp_number > 0) disp_number--;
+					else                disp_number = image_cnt-1;
+					
+				} else if(movement < -50) {
+					
+					if(disp_number < image_cnt-1) disp_number++;
+					else                          disp_number = 0;
 					
 				}
 				
